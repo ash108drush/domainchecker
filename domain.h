@@ -31,6 +31,10 @@ public:
         return (domain_name_.find("." + domain.domain_name_) != string::npos);
 
     }
+
+    std::string GetString(){
+        return domain_name_;
+    }
 private:
     string domain_name_;
 };
