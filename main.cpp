@@ -11,18 +11,4 @@ int main() {
     }
 }
 
-/*
- 4
-gdz.ru
-maps.me
-m.gdz.ru
-com
-7
-gdz.ru
-gdz.com
-m.maps.me
-alg.m.gdz.ru
-maps.com
-maps.ru
-gdz.ua
-*/
+

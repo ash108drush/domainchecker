@@ -16,6 +16,10 @@ private slots:
     void cleanupTestCase();
     void cleanup();
     void test_case1();
+
+private:
+    std::vector<std::string> forbidden_domains_;
+    std::vector<std::string> test_domains_;
 };
 
 test_domain::test_domain() {}
@@ -25,13 +29,9 @@ test_domain::~test_domain() {}
 void test_domain::initTestCase()
 {
     // code to be executed before the first test function
-    const std::vector<Domain> forbidden_domains = ReadDomains(cin, ReadNumberOnLine<size_t>(cin));
-    DomainChecker checker(forbidden_domains.begin(), forbidden_domains.end());
+    forbidden_domains_ = {"gdz.ru", "maps.me", "m.gdz.ru","com"};
+    test_domains_  = {"gdz.ru", "gdz.com", "m.maps.me","alg.m.gdz.ru","maps.com","maps.ru","gdz.ua"};
 
-    const std::vector<Domain> test_domains = ReadDomains(cin, ReadNumberOnLine<size_t>(cin));
-    for (const Domain& domain : test_domains) {
-        cout << (checker.IsForbidden(domain) ? "Bad"sv : "Good"sv) << endl;
-    }
 }
 
 void test_domain::init()
