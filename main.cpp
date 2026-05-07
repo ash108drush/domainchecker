@@ -37,6 +37,7 @@ public:
            // std::cout << "found subdomain" << std::endl;
             return true;
         }
+        std::cout << " not found subdomain: " << rev_domain_name_  << "===" << domain.rev_domain_name_ << std::endl;
         return false;
 
     }
@@ -44,7 +45,7 @@ public:
     std::string GetString() const{
         return domain_name_;
     }
-    std::string_view GetReverse() const{
+    std::string GetReverse() const{
         return rev_domain_name_;
     }
     friend bool operator==(Domain& domain1,Domain& domain2 );
@@ -62,9 +63,9 @@ public:
     template <typename InputIt>
     DomainChecker(InputIt begin, InputIt end):domains_(begin,end) {
         std::sort(domains_.begin(),domains_.end(),[](const Domain& left, const Domain& right  ){
-            std::string_view lstring = left.GetReverse();
-            std::string_view rstring = right.GetReverse();
-            return std::lexicographical_compare(lstring.begin(), lstring.end(), rstring.begin(), rstring.end());
+            std::string lstring = left.GetReverse();
+            std::string rstring = right.GetReverse();
+            return std::lexicographical_compare( lstring.begin(), lstring.end(),rstring.begin(), rstring.end());
         });
 
         auto last = std::unique(domains_.begin(),domains_.end(),[](const Domain& left, const Domain& right ){
@@ -74,7 +75,13 @@ public:
         });
 
         domains_.erase(last, domains_.end());
-    }
+        std::sort(domains_.begin(),domains_.end(),[](const Domain& left, const Domain& right  ){
+            std::string lstring = left.GetReverse();
+            std::string rstring = right.GetReverse();
+            return std::lexicographical_compare( lstring.begin(), lstring.end(),rstring.begin(), rstring.end());
+        });
+
+  }
 
     void PrintDomains(){
         for(auto& d: domains_){
@@ -87,8 +94,9 @@ public:
 
     // разработайте метод IsForbidden, возвращающий true, если домен запрещён
     bool IsForbidden(const Domain& domain){
-      //  string_view value = domain.GetReverse();
 
+        std::cout << "++++++++++++++++++" << std::endl;
+/*
         for(auto d:domains_){
             bool subdomain = (d.IsSubdomain(domain) || domain.IsSubdomain(d));
             bool equal = (domain == d);
@@ -97,21 +105,31 @@ public:
             }
         }
 
-
+*/
         //std::cout << "size:" << domains_.size() << std::endl;
-       /* auto upper = std::upper_bound(domains_.begin(), domains_.end(),value,[](string_view str, const Domain& left  ){
-            std::string_view lstring = left.GetReverse();
-            int min = std::min(lstring.size(), str.size());
-            std::cout <<"compare: "   << lstring << " to: " << str << std::endl;
+     auto upper = std::upper_bound(domains_.begin(), domains_.end(),domain,[](const Domain& value, const Domain& forbidden  ){
+            //std::string lstring = value.GetReverse();
+            //std::string rstring = forbidden.GetReverse();
+            //std::cout <<"compare: "   << lstring << " to: " << rstring << std::endl;
+            //return (lstring.compare(rstring) <=0);
+            return value.IsSubdomain(forbidden);
 
-           return std::lexicographical_compare( str.begin(), str.end(),lstring.begin(), lstring.end());
+//                (lstring.compare(rstring) <= 0);
+//value.IsSubdomain(forbidden) || forbidden.IsSubdomain(value) ||
+
         });
         if(upper == domains_.begin()){
+            cout << "begin:" << upper->GetString() << std::endl;
             return false;
         }
-*/
+        if(upper == domains_.end()){
+            std::cout << "out of range: "  << domain.GetString()<< std::endl;
+            return false;
+        }else{
+            cout << "upper:" << upper->GetString() << std::endl;
+        }
 
-        return false;
+        return true;
     }
 private:
     std::vector<Domain> domains_;
@@ -166,7 +184,7 @@ int main() {
 
     const std::vector<Domain> test_domains = ReadDomains(cin, ReadNumberOnLine<size_t>(cin));
 
-    //checker.PrintDomains();
+   //checker.PrintDomains();
 
     for (const Domain& domain : test_domains) {
         cout << (checker.IsForbidden(domain) ? "Bad"sv : "Good"sv) << endl;
@@ -174,6 +192,29 @@ int main() {
     }
 
 }
+
+
+
+/*
+1
+a
+4
+aaaa.aa
+aaaa.aaa.a
+a.a.a
+a
+
+
+1
+a
+1
+aaaa.aa
+
+
+
+*/
+
+
 /*
  *4
 1
