@@ -57,7 +57,9 @@ void test_domain::test_subdomain() {
         Domain dom1 = Domain(d1);
             for(auto& d2: forbidden_domains_){
                 Domain dom2 = Domain(d2);
-                if(dom1.IsSubdomain(dom2)){
+              if((dom1 != dom2) && dom1.IsSubdomain(dom2)){
+                    //std::cout<< "rev1 " << dom1.GetString() << std::endl;
+                   // std::cout<< "rev " << dom2.GetReverse() << std::endl;
                     std::cout << dom1.GetString() << " is subdomain: " << dom2.GetString() << std::endl;
                 }
 
