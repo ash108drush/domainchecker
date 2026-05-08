@@ -15,9 +15,11 @@ using namespace std;
 class Domain {
     // разработайте класс домена
 public:
-    Domain(const std::string str):domain_name_(str),rev_domain_name_(str){
-        rev_domain_name_ = "." + rev_domain_name_;
-        std::reverse(rev_domain_name_.begin(), rev_domain_name_.end());
+    Domain(const std::string str):domain_name_(str){
+        std::string rev_name = "." +domain_name_;
+        //std::reverse(rev_name.begin(), rev_name.end());
+        rev_domain_name_ = std::string(rev_name.rbegin(),rev_name.rend());
+        //std::reverse(rev_domain_name_.begin(), rev_domain_name_.end());
         // std::cout << "rev-name: " << rev_domain_name_ << std::endl;
 
     }
@@ -37,15 +39,25 @@ public:
            // std::cout << "found subdomain" << std::endl;
             return true;
         }
-        std::cout << " not found subdomain: " << rev_domain_name_  << "===" << domain.rev_domain_name_ << std::endl;
+        //std::cout << " not found subdomain: " << rev_domain_name_  << "===" << domain.rev_domain_name_ << std::endl;
         return false;
 
     }
 
-    std::string GetString() const{
+    bool IsSubdomain(const string_view domain) const{
+        int min = std::min(rev_domain_name_.size(), domain.size());
+        if(rev_domain_name_.compare(0, min, domain) == 0){
+            return true;
+        }
+       // std::cout << " not found subdomain: " << rev_domain_name_  << "===" << domain << std::endl;
+        return false;
+
+    }
+
+    std::string_view GetString() const{
         return domain_name_;
     }
-    std::string GetReverse() const{
+    std::string_view GetReverse() const{
         return rev_domain_name_;
     }
     friend bool operator==(Domain& domain1,Domain& domain2 );
@@ -62,10 +74,17 @@ public:
     // конструктор должен принимать список запрещённых доменов через пару итераторов
     template <typename InputIt>
     DomainChecker(InputIt begin, InputIt end):domains_(begin,end) {
+        for(auto i= domains_.begin(); i != domains_.end(); ++i){
+            rev_names_.push_back(i->GetReverse());
+        }
         std::sort(domains_.begin(),domains_.end(),[](const Domain& left, const Domain& right  ){
-            std::string lstring = left.GetReverse();
-            std::string rstring = right.GetReverse();
+            std::string_view lstring = left.GetReverse();
+            std::string_view rstring = right.GetReverse();
             return std::lexicographical_compare( lstring.begin(), lstring.end(),rstring.begin(), rstring.end());
+        });
+
+        std::sort(rev_names_.begin(),rev_names_.end(),[](const string_view left, const string_view right  ){
+            return std::lexicographical_compare( left.begin(), left.end(),right.begin(), right.end());
         });
 
         auto last = std::unique(domains_.begin(),domains_.end(),[](const Domain& left, const Domain& right ){
@@ -74,18 +93,22 @@ public:
             return (subdomain || equal);
         });
 
+        //auto lasts = std::unique(rev_names_.begin(),rev_names_.end(),[](const string_view left, const string_view right){
+//
+
+       //     return std::lexicographical_compare( left.begin(), left.end(),right.begin(), right.end());
+
+      //  });
+
+        //rev_names_.erase(lasts,rev_names_.end());
         domains_.erase(last, domains_.end());
-        std::sort(domains_.begin(),domains_.end(),[](const Domain& left, const Domain& right  ){
-            std::string lstring = left.GetReverse();
-            std::string rstring = right.GetReverse();
-            return std::lexicographical_compare( lstring.begin(), lstring.end(),rstring.begin(), rstring.end());
-        });
+
 
   }
 
     void PrintDomains(){
-        for(auto& d: domains_){
-            std::cout << "name:" << d.GetString() << std::endl;
+        for(auto& d: rev_names_){
+            std::cout << "vector name:" << d << std::endl;
         }
         for(auto& d: domains_){
             std::cout << "rev_name:" << d.GetReverse() << std::endl;
@@ -133,6 +156,8 @@ public:
     }
 private:
     std::vector<Domain> domains_;
+    std::vector<std::string_view> rev_names_;
+
 
 };
 
@@ -184,18 +209,35 @@ int main() {
 
     const std::vector<Domain> test_domains = ReadDomains(cin, ReadNumberOnLine<size_t>(cin));
 
-   //checker.PrintDomains();
-
+   checker.PrintDomains();
+/*
     for (const Domain& domain : test_domains) {
         cout << (checker.IsForbidden(domain) ? "Bad"sv : "Good"sv) << endl;
         //cout << domain.GetString() << endl;
     }
-
+*/
 }
 
 
 
 /*
+ *
+ *
+
+4
+gdz.ru
+maps.me
+m.gdz.ru
+com
+7
+gdz.ru
+gdz.com
+m.maps.me
+alg.m.gdz.ru
+maps.com
+maps.ru
+gdz.ua
+
 1
 a
 4
